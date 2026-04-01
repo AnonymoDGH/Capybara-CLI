@@ -1,0 +1,19 @@
+archives_dir: archives
+auto_archive_threshold_kb: 400
+auto_version: true
+backup_on_write: true
+compression_algorithm: semantic
+contexts_dir: contexts
+decay_rates:
+  architectural: 0.2
+  emotional: 0.15
+  operational: -0.1
+  relational: 0.1
+  temporal: -0.05
+default_author: Unknown AI
+git_sync_enabled: true
+max_archive_size_kb: 2000
+max_context_size_kb: 500
+mega_archives_dir: mega_archives
+memory_dir: .sage_memory
+staging_dir: .staging
