@@ -1,3 +1,5 @@
+"""NVIDIA NIM API provider for Capybara CLI."""
+
 from __future__ import annotations
 
 from typing import AsyncIterator
@@ -8,6 +10,11 @@ from .base import BaseLLMProvider, LLMResponse, Message
 
 
 class NVIDIAProvider(BaseLLMProvider):
+    """NVIDIA NIM API provider.
+    
+    Get API key from: https://build.nvidia.com/explore
+    """
+    
     DEFAULT_MODELS = {
         "llama-3.1-405b": "meta/llama-3.1-405b-instruct",
         "llama-3.1-70b": "meta/llama-3.1-70b-instruct",
@@ -17,10 +24,7 @@ class NVIDIAProvider(BaseLLMProvider):
         "mixtral-8x7b": "mistralai/mixtral-8x7b-instruct-v0.1",
         "arctic": "snowflake/arctic",
         "dbrx": "databricks/dbrx-instruct",
-        "fuyu-8b": "adept/fuyu-8b",
-        "kosmos-2": "microsoft/kosmos-2",
         "phi-3": "microsoft/phi-3-medium-4k-instruct",
-        "starcoder2": "bigcode/starcoder2-15b",
         "gemma-2-27b": "google/gemma-2-27b-it",
         "gemma-2-9b": "google/gemma-2-9b-it",
     }
@@ -28,6 +32,14 @@ class NVIDIAProvider(BaseLLMProvider):
     def __init__(self, model: str = "llama-3.1-405b", api_key: str | None = None, **kwargs):
         super().__init__(model, api_key, **kwargs)
         self.api_base = self.api_base or "https://integrate.api.nvidia.com/v1"
+        
+        if not self.api_key:
+            raise ValueError(
+                "NVIDIA API key is required. "
+                "Get one at https://build.nvidia.com/explore "
+                "and set NVIDIA_API_KEY environment variable."
+            )
+        
         self._resolve_model()
         self.client = httpx.AsyncClient(
             base_url=self.api_base,
@@ -48,8 +60,17 @@ class NVIDIAProvider(BaseLLMProvider):
             "top_p": kwargs.get("top_p", self.top_p),
         }
         
-        response = await self.client.post("/chat/completions", json=payload)
-        response.raise_for_status()
+        try:
+            response = await self.client.post("/chat/completions", json=payload)
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:
+                raise ValueError(
+                    "NVIDIA API authentication failed. "
+                    "Please check your NVIDIA_API_KEY at https://build.nvidia.com/explore"
+                ) from e
+            raise
+        
         data = response.json()
         
         choice = data["choices"][0]
@@ -73,17 +94,25 @@ class NVIDIAProvider(BaseLLMProvider):
             "stream": True,
         }
         
-        async with self.client.stream("POST", "/chat/completions", json=payload) as response:
-            response.raise_for_status()
-            async for line in response.aiter_lines():
-                if line.startswith("data: "):
-                    data = line[6:]
-                    if data == "[DONE]":
-                        break
-                    import json
-                    chunk = json.loads(data)
-                    if chunk["choices"][0].get("delta", {}).get("content"):
-                        yield chunk["choices"][0]["delta"]["content"]
+        try:
+            async with self.client.stream("POST", "/chat/completions", json=payload) as response:
+                response.raise_for_status()
+                async for line in response.aiter_lines():
+                    if line.startswith("data: "):
+                        data = line[6:]
+                        if data == "[DONE]":
+                            break
+                        import json
+                        chunk = json.loads(data)
+                        if chunk["choices"][0].get("delta", {}).get("content"):
+                            yield chunk["choices"][0]["delta"]["content"]
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:
+                raise ValueError(
+                    "NVIDIA API authentication failed. "
+                    "Please check your NVIDIA_API_KEY at https://build.nvidia.com/explore"
+                ) from e
+            raise
     
     def count_tokens(self, text: str) -> int:
         return len(text.split()) * 2
