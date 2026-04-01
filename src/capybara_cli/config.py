@@ -13,8 +13,8 @@ import yaml
 @dataclass
 class LLMConfig:
     """LLM provider configuration."""
-    provider: str = "openai"
-    model: str = "gpt-4-turbo-preview"
+    provider: str = "nvidia"
+    model: str = "llama-3.1-405b"
     api_key: Optional[str] = None
     api_base: Optional[str] = None
     temperature: float = 0.7
