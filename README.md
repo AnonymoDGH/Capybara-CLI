@@ -1,7 +1,7 @@
-# 🦫 Capybara CLI
+# Capybara CLI
 
 <p align="center">
-  <img src="https://www.svgrepo.com/show/104660/capybara-head.svg" alt="Capybara CLI" width="200">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Capybara.svg/3840px-Capybara.svg.png" alt="Capybara CLI" width="200">
 </p>
 
 <p align="center">
