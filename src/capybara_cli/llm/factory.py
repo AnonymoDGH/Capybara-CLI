@@ -1,11 +1,21 @@
+"""Factory for creating LLM providers."""
+
 from __future__ import annotations
 
-from .anthropic import AnthropicProvider
-from .base import BaseLLMProvider
-from .google import GoogleProvider
-from .local import LocalProvider
-from .nvidia import NVIDIAProvider
-from .openai import OpenAIProvider
+try:
+    from .anthropic import AnthropicProvider
+    from .base import BaseLLMProvider
+    from .google import GoogleProvider
+    from .local import LocalProvider
+    from .nvidia import NVIDIAProvider
+    from .openai import OpenAIProvider
+except ImportError:
+    from anthropic import AnthropicProvider
+    from base import BaseLLMProvider
+    from google import GoogleProvider
+    from local import LocalProvider
+    from nvidia import NVIDIAProvider
+    from openai import OpenAIProvider
 
 
 PROVIDERS = {
@@ -56,7 +66,7 @@ def list_models_for_provider(provider: str) -> list[str]:
     models = {
         "openai": ["gpt-4-turbo-preview", "gpt-4", "gpt-4o", "gpt-3.5-turbo"],
         "anthropic": ["claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229"],
-        "nvidia": list(NVIDIAProvider.DEFAULT_MODELS.keys()),
+        "nvidia": ["llama-3.1-405b", "llama-3.1-70b", "llama-3.1-8b", "nemotron-4-340b", "mixtral-8x22b", "mixtral-8x7b"],
         "google": ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.0-pro"],
         "local": ["local-model"],
         "ollama": ["llama3.1", "llama3", "mistral", "codellama", "qwen2.5-coder"],

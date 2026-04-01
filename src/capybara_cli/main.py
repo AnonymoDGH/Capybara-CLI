@@ -11,28 +11,90 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+from rich.live import Live
+from rich.layout import Layout
+from rich.align import Align
 
-from .agent import CapybaraAgent
-from .config import Config, load_config
-from .exceptions import CapybaraError
-from .logger import setup_logging
+try:
+    from .agent import CapybaraAgent
+    from .config import Config, load_config
+    from .exceptions import CapybaraError
+    from .logger import setup_logging
+except ImportError:
+    from agent import CapybaraAgent
+    from config import Config, load_config
+    from exceptions import CapybaraError
+    from logger import setup_logging
 
 console = Console()
 
 
+def get_capybara_ascii() -> str:
+    return """
+    ██████╗  █████╗ ██████╗ ██╗   ██╗██████╗  █████╗ ██████╗  █████╗ 
+    ██╔════╝ ██╔══██╗██╔══██╗╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗██╔══██╗
+    ██║     ███████║██████╔╝ ╚████╔╝ ██████╔╝███████║██████╔╝███████║
+    ██║     ██╔══██║██╔═══╝   ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗██╔══██║
+    ╚██████╗██║  ██║██║        ██║   ██████╔╝██║  ██║██████╔╝██║  ██║
+     ╚═════╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝
+    """
+
+
+def get_capybara_small() -> str:
+    return """
+ ██████             
+███ ███████████████ 
+████████████████████
+    ████████████████
+   █████████████████
+   ██  ██     █████ 
+     ████   ██████  
+    """
+
+
 def print_banner():
     """Print the Capybara CLI banner."""
-    banner = """
-    ╭────────────────────────────────────────────╮
-    │                                            │
-    │   🦫 CAPYBARA CLI v0.1.0                  │
-    │                                            │
-    │   Expert coding agent with superior        │
-    │   performance on programming tasks         │
-    │                                            │
-    ╰────────────────────────────────────────────╯
+    ascii_art = get_capybara_small()
+    
+    banner_text = f"""{ascii_art}
+    
+    🦫 CAPYBARA CLI v0.1.0
+    
+    Expert coding agent with superior performance
+    on programming tasks, academic reasoning, 
+    and cybersecurity evaluations.
     """
-    console.print(Panel(banner, border_style="green", padding=(0, 2)))
+    
+    console.print(Panel(
+        Align.center(banner_text),
+        border_style="green",
+        padding=(1, 2),
+        title="[bold green]Welcome[/bold green]",
+        subtitle="[dim]Type 'help' for commands or 'exit' to quit[/dim]"
+    ))
+
+
+def print_interactive_header():
+    """Print header for interactive mode like Claude Code."""
+    ascii_art = get_capybara_small()
+    
+    header = f"""╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                              │
+│{ascii_art:^126}│
+│                                                                                                                              │
+│   🦫 Capybara CLI v0.1.0                                          Expert coding agent with superior performance             │
+│                                                                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯"""
+    console.print(header, style="green")
+
+
+def print_status_bar(config: Config):
+    """Print status bar with current model and settings."""
+    model = config.llm.model if config.llm.model else "default"
+    provider = config.llm.provider
+    
+    status = f"╭─ {provider.upper()} · {model} ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮"
+    console.print(status, style="dim")
 
 
 @click.group(invoke_without_command=True)
@@ -44,10 +106,8 @@ def cli(ctx: click.Context, config: Optional[str], verbose: bool, model: Optiona
     """🦫 Capybara CLI - Expert coding agent."""
     ctx.ensure_object(dict)
     
-    # Setup logging
     setup_logging(verbose=verbose)
     
-    # Load configuration
     config_path = Path(config) if config else None
     cfg = load_config(config_path)
     
@@ -58,14 +118,14 @@ def cli(ctx: click.Context, config: Optional[str], verbose: bool, model: Optiona
     ctx.obj["verbose"] = verbose
     
     if ctx.invoked_subcommand is None:
-        # Start interactive mode
         asyncio.run(interactive_mode(cfg))
 
 
 async def interactive_mode(config: Config):
     """Run Capybara in interactive chat mode."""
-    print_banner()
-    console.print("\n[dim]Starting interactive session...[/dim]\n")
+    print_interactive_header()
+    print_status_bar(config)
+    console.print()
     
     agent = CapybaraAgent(config)
     
@@ -87,7 +147,6 @@ async def interactive_mode(config: Config):
                 if not user_input.strip():
                     continue
                 
-                # Process the request
                 with console.status("[bold green]Capybara is thinking...", spinner="dots"):
                     response = await agent.chat(user_input)
                 
@@ -287,7 +346,10 @@ async def _security_command(config: Config, target: Optional[str], scan_all: boo
 @click.pass_context
 def version(ctx: click.Context):
     """Show version information."""
-    from . import __version__
+    try:
+        from . import __version__
+    except ImportError:
+        from __init__ import __version__
     console.print(f"[bold green]Capybara CLI[/bold green] version [cyan]{__version__}[/cyan]")
 
 

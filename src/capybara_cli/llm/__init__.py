@@ -4,11 +4,11 @@ from .anthropic import AnthropicProvider
 from .nvidia import NVIDIAProvider
 from .google import GoogleProvider
 from .local import LocalProvider
-from .factory import create_provider
+from .factory import create_provider, list_available_providers, list_models_for_provider
 
 __all__ = [
     "BaseLLMProvider",
-    "LLMResponse", 
+    "LLMResponse",
     "Message",
     "Role",
     "OpenAIProvider",
@@ -17,4 +17,6 @@ __all__ = [
     "GoogleProvider",
     "LocalProvider",
     "create_provider",
+    "list_available_providers",
+    "list_models_for_provider",
 ]

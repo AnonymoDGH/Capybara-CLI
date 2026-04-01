@@ -1,3 +1,5 @@
+"""Main agent implementation for Capybara CLI."""
+
 from __future__ import annotations
 
 import asyncio
@@ -6,12 +8,20 @@ from typing import Any
 
 from rich.console import Console
 
-from .config import Config
-from .llm import Message, Role, create_provider
-from .llm.base import LLMResponse
-from .logger import get_logger
-from .memory import MemoryManager
-from .tools import ToolRegistry
+try:
+    from .config import Config
+    from .llm import Message, Role, create_provider
+    from .llm.base import LLMResponse
+    from .logger import get_logger
+    from .memory import MemoryManager
+    from .tools import ToolRegistry
+except ImportError:
+    from config import Config
+    from llm import Message, Role, create_provider
+    from llm.base import LLMResponse
+    from logger import get_logger
+    from memory import MemoryManager
+    from tools import ToolRegistry
 
 console = Console()
 logger = get_logger("agent")

@@ -1,16 +1,29 @@
+"""Tool registry for managing available tools."""
+
 from __future__ import annotations
 
 from typing import Any
 
-from .base import BaseTool, ToolResult
-from .bash import BashTool
-from .code_analysis import CodeAnalysisTool
-from .code_execution import CodeExecutionTool
-from .file_edit import FileEditTool
-from .file_read import FileReadTool
-from .git import GitTool
-from .search import SearchTool
-from .web_search import WebSearchTool
+try:
+    from .base import BaseTool, ToolResult
+    from .bash import BashTool
+    from .code_analysis import CodeAnalysisTool
+    from .code_execution import CodeExecutionTool
+    from .file_edit import FileEditTool
+    from .file_read import FileReadTool
+    from .git import GitTool
+    from .search import SearchTool
+    from .web_search import WebSearchTool
+except ImportError:
+    from base import BaseTool, ToolResult
+    from bash import BashTool
+    from code_analysis import CodeAnalysisTool
+    from code_execution import CodeExecutionTool
+    from file_edit import FileEditTool
+    from file_read import FileReadTool
+    from git import GitTool
+    from search import SearchTool
+    from web_search import WebSearchTool
 
 
 class ToolRegistry:

@@ -34,6 +34,7 @@ class LLMConfig:
             "anthropic": "ANTHROPIC_API_KEY",
             "google": "GOOGLE_API_KEY",
             "cohere": "COHERE_API_KEY",
+            "nvidia": "NVIDIA_API_KEY",
         }
         env_var = env_vars.get(self.provider, f"{self.provider.upper()}_API_KEY")
         return os.getenv(env_var)
@@ -70,7 +71,7 @@ class ToolConfig:
 @dataclass
 class MemoryConfig:
     """Memory system configuration."""
-    type: str = "hybrid"  # short_term, long_term, hybrid
+    type: str = "hybrid"
     context_window: int = 128000
     cache_enabled: bool = True
     summarization_threshold: int = 8000
@@ -88,8 +89,13 @@ class SecurityConfig:
     blocked_patterns: list[str] = field(default_factory=lambda: [
         r"rm\s+-rf\s+/",
         r">\s*/dev/",
+        r":\(\)\{\s*:\|\:&\s*\};:",
         r"curl.*\|.*sh",
         r"wget.*\|.*sh",
+        r"mkfs",
+        r"dd\s+if=",
+        r"\bsu\b",
+        r"\bsudo\b",
     ])
     scan_for_secrets: bool = True
     auto_fix_security_issues: bool = False
@@ -166,9 +172,9 @@ class Config:
 
 def get_default_config_path() -> Path:
     """Get the default configuration file path."""
-    if os.name == "nt":  # Windows
+    if os.name == "nt":
         config_dir = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
-    else:  # Unix-like
+    else:
         config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
     
     capybara_dir = config_dir / "capybara"

@@ -1,9 +1,4 @@
-"""
-Capybara CLI - An expert coding agent with superior performance.
-
-A powerful AI coding assistant that outperforms previous state-of-the-art models
-on programming tasks, academic reasoning, and cybersecurity evaluations.
-"""
+"""Capybara CLI - An expert coding agent with superior performance."""
 
 __version__ = "0.1.0"
 __author__ = "Capybara Team"

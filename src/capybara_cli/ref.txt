@@ -1,0 +1,8 @@
+╭─── Claude Code v2.1.89 ──────────────────────────────────────────────────────────────────────────────────────────────╮│                                    │ Tips for getting started                                                        ││            Welcome back!           │ Run /init to create a CLAUDE.md file with instructions for Claude               ││                                    │ Note: You have launched claude in your home directory. For the best experience… ││               ▐▛███▜▌              │ ─────────────────────────────────────────────────────────────────────────────── ││              ▝▜█████▛▘             │ Recent activity                                                                 ││                ▘▘ ▝▝               │ No recent activity                                                              ││                                    │                                                                                 ││   Sonnet 4.6 · API Usage Billing   │                                                                                 ││          C:\Users\USUARIO          │                                                                                 │╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+
+  ▝▜▄     Gemini CLI v0.35.3
+    ▝▜▄
+   ▗▟▀    Signed in with Google: js1626482@gmail.com /auth
+  ▝▀      Plan: Gemini Code Assist for individuals /upgrade

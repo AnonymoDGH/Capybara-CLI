@@ -1,10 +1,17 @@
+"""Memory manager for Capybara CLI."""
+
 from __future__ import annotations
 
 from typing import Any
 
-from ..config import MemoryConfig
-from .long_term import LongTermMemory
-from .short_term import ShortTermMemory
+try:
+    from ..config import MemoryConfig
+    from .long_term import LongTermMemory
+    from .short_term import ShortTermMemory
+except ImportError:
+    from config import MemoryConfig
+    from long_term import LongTermMemory
+    from short_term import ShortTermMemory
 
 
 class MemoryManager:
